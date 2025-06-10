@@ -1,0 +1,216 @@
+<html>
+	<head>
+		<title>Develop Page</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	
+	<style>
+		/* Base styles */
+		body {
+			background-color: system-ui;
+			margin: 0;
+			padding: 0;
+			font-family: Arial, sans-serif;
+		}
+
+		/* Layout */
+		form {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			height: 100vh;
+			padding: 0 20px;
+		}
+
+		/* Input styles */
+		input[type="url"] {
+			width: 100%;
+			max-width: 500px;
+			padding: 15px;
+			font-size: 18px;
+			margin-bottom: 20px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+		}
+
+		/* Button styles */
+		button {
+			flex: 1;
+			padding: 15px 30px;
+			font-size: 18px;
+			background-color: #007BFF;
+			color: white;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			position: relative;
+			min-width: 120px;
+		}
+
+		button:hover {
+			background-color: #0056b3;
+		}
+
+		/* Loading animation */
+		.loading {
+			display: none;
+			width: 20px;
+			height: 20px;
+			border: 3px solid #f3f3f3;
+			border-top: 3px solid #007BFF;
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+		}
+
+		@keyframes spin {
+			0% { transform: translate(-50%, -50%) rotate(0deg); }
+			100% { transform: translate(-50%, -50%) rotate(360deg); }
+		}
+
+		button.downloading {
+			color: transparent;
+		}
+
+		button.downloading .loading {
+			display: block;
+		}
+
+		/* Fancy text styles */
+		.fancy-text {
+			font-size: 32px;
+			font-weight: bold;
+			margin-bottom: 15px;
+			font-family: 'Arial', sans-serif;
+		}
+
+		.fancy-text span:nth-child(1) {
+			background: linear-gradient(45deg, #FF0000, #FF8C00);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			font-size: 40px;
+			text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+		}
+
+		.fancy-text span:nth-child(2) {
+			background: linear-gradient(45deg, #4B0082, #9400D3);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			font-size: 45px;
+			text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+		}
+
+		.fancy-text span:nth-child(3) {
+			background: linear-gradient(45deg, #00FF00, #00FFFF);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			font-size: 38px;
+			text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+		}
+
+		.fancy-text span:nth-child(4) {
+			background: linear-gradient(45deg, #FF1493, #FF69B4);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			font-size: 42px;
+			text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+			animation: sparkle 2s infinite;
+		}
+
+		@keyframes sparkle {
+			0% { opacity: 1; }
+			50% { opacity: 0.8; }
+			100% { opacity: 1; }
+		}
+
+		/* Button container styles */
+		.button-container {
+			display: flex;
+			gap: 20px;
+			justify-content: center;
+			width: 100%;
+			max-width: 500px;
+		}
+
+		/* Clear button styles */
+		button.clear {
+			background-color: #6c757d;
+		}
+
+		button.clear:hover {
+			background-color: #5a6268;
+		}
+	</style>
+
+	<body>
+		<form method="POST" id="dwForm">
+			<div class="fancy-text">
+				<span>u</span><span>r</span><span>l</span><span>:</span>
+			</div>
+			<input name="url" type="url" placeholder="Enter URL">
+			<div class="button-container">
+				<button type="button" onclick="dw()">
+					start
+					<div class="loading"></div>
+				</button>
+				<button type="button" class="clear" onclick="clearInput()">
+					clear
+				</button>
+			</div>
+		</form>
+	</body>
+</html>
+
+<script>
+	function dw() {
+		const button = document.querySelector('button');
+		button.classList.add('downloading');
+		
+		const form = document.getElementById('dwForm');
+		const formData = new FormData(form);
+		const urlParams = new URLSearchParams(formData);
+
+		fetch('/download', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded'
+			},
+			body: urlParams
+		})
+		.then(response => {
+			if (!response.ok) throw new Error('Network response was not ok');
+
+			const disposition = response.headers.get('Content-Disposition');
+			const fileNameMatch = disposition && disposition.match(/filename\*=UTF-8''(.+)/);
+			const fileName = fileNameMatch ? decodeURIComponent(fileNameMatch[1]) : 'audio.mp3';
+
+			return response.blob().then(blob => ({ blob, fileName }));
+		})
+		.then(({ blob, fileName }) => {
+			const url = window.URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = fileName;
+			document.body.appendChild(a);
+			a.click();
+			a.remove();
+			window.URL.revokeObjectURL(url);
+			button.classList.remove('downloading');
+		})
+		.catch(error => {
+			console.error('Error:', error);
+			alert('Download failed: ' + error.message);
+			button.classList.remove('downloading');
+		});
+	}
+
+	function clearInput() {
+		const input = document.querySelector('input[name="url"]');
+		input.value = '';
+		input.focus();
+	}
+</script>
