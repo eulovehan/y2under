@@ -1,3 +1,6 @@
 dist/
 .history/
 node_modules/
+folders/
+!.vscode/
+!.vscode/*

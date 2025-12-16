@@ -1,9 +1,9 @@
 <html>
 	<head>
 		<title>Develop Page</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 	</head>
-	
+
 	<style>
 		/* Base styles */
 		body {
@@ -24,22 +24,38 @@
 		}
 
 		/* Input styles */
-		input[type="url"] {
+		input[type='url'] {
 			width: 100%;
-			max-width: 500px;
+			flex: 1;
 			padding: 15px;
 			font-size: 18px;
-			margin-bottom: 20px;
 			border: 1px solid #ccc;
 			border-radius: 4px;
 		}
 
+		.input-group {
+			display: flex;
+			width: 100%;
+			max-width: 500px;
+			gap: 10px;
+			margin-bottom: 20px;
+		}
+
+		#inputs-container {
+			width: 100%;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			max-height: 60vh;
+			overflow-y: auto;
+			padding: 10px;
+		}
+
 		/* Button styles */
 		button {
-			flex: 1;
 			padding: 15px 30px;
 			font-size: 18px;
-			background-color: #007BFF;
+			background-color: #007bff;
 			color: white;
 			border: none;
 			border-radius: 4px;
@@ -52,13 +68,35 @@
 			background-color: #0056b3;
 		}
 
+		.remove-btn {
+			width: auto;
+			min-width: 50px;
+			padding: 15px;
+			background-color: #dc3545;
+		}
+
+		.remove-btn:hover {
+			background-color: #c82333;
+		}
+
+		.add-btn {
+			margin-bottom: 20px;
+			background-color: #28a745;
+			max-width: 500px;
+			width: 100%;
+		}
+
+		.add-btn:hover {
+			background-color: #218838;
+		}
+
 		/* Loading animation */
 		.loading {
 			display: none;
 			width: 20px;
 			height: 20px;
 			border: 3px solid #f3f3f3;
-			border-top: 3px solid #007BFF;
+			border-top: 3px solid #007bff;
 			border-radius: 50%;
 			animation: spin 1s linear infinite;
 			position: absolute;
@@ -68,8 +106,12 @@
 		}
 
 		@keyframes spin {
-			0% { transform: translate(-50%, -50%) rotate(0deg); }
-			100% { transform: translate(-50%, -50%) rotate(360deg); }
+			0% {
+				transform: translate(-50%, -50%) rotate(0deg);
+			}
+			100% {
+				transform: translate(-50%, -50%) rotate(360deg);
+			}
 		}
 
 		button.downloading {
@@ -89,42 +131,48 @@
 		}
 
 		.fancy-text span:nth-child(1) {
-			background: linear-gradient(45deg, #FF0000, #FF8C00);
+			background: linear-gradient(45deg, #ff0000, #ff8c00);
 			-webkit-background-clip: text;
 			-webkit-text-fill-color: transparent;
 			font-size: 40px;
-			text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 		}
 
 		.fancy-text span:nth-child(2) {
-			background: linear-gradient(45deg, #4B0082, #9400D3);
+			background: linear-gradient(45deg, #4b0082, #9400d3);
 			-webkit-background-clip: text;
 			-webkit-text-fill-color: transparent;
 			font-size: 45px;
-			text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 		}
 
 		.fancy-text span:nth-child(3) {
-			background: linear-gradient(45deg, #00FF00, #00FFFF);
+			background: linear-gradient(45deg, #00ff00, #00ffff);
 			-webkit-background-clip: text;
 			-webkit-text-fill-color: transparent;
 			font-size: 38px;
-			text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 		}
 
 		.fancy-text span:nth-child(4) {
-			background: linear-gradient(45deg, #FF1493, #FF69B4);
+			background: linear-gradient(45deg, #ff1493, #ff69b4);
 			-webkit-background-clip: text;
 			-webkit-text-fill-color: transparent;
 			font-size: 42px;
-			text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 			animation: sparkle 2s infinite;
 		}
 
 		@keyframes sparkle {
-			0% { opacity: 1; }
-			50% { opacity: 0.8; }
-			100% { opacity: 1; }
+			0% {
+				opacity: 1;
+			}
+			50% {
+				opacity: 0.8;
+			}
+			100% {
+				opacity: 1;
+			}
 		}
 
 		/* Button container styles */
@@ -147,70 +195,131 @@
 	</style>
 
 	<body>
-		<form method="POST" id="dwForm">
-			<div class="fancy-text">
-				<span>u</span><span>r</span><span>l</span><span>:</span>
+		<form method="POST" id="dwForm" onsubmit="event.preventDefault()">
+			<div class="fancy-text"><span>u</span><span>r</span><span>l</span><span>s</span><span>:</span></div>
+
+			<div id="inputs-container">
+				<div class="input-group">
+					<input name="url" type="url" placeholder="Enter URL" />
+					<button type="button" class="remove-btn" onclick="removeInput(this)" style="display: none">X</button>
+				</div>
 			</div>
-			<input name="url" type="url" placeholder="Enter URL">
+
+			<button type="button" class="add-btn" onclick="addInput()">+ Add URL</button>
+
 			<div class="button-container">
 				<button type="button" onclick="dw()">
-					start
+					start all
 					<div class="loading"></div>
 				</button>
-				<button type="button" class="clear" onclick="clearInput()">
-					clear
-				</button>
+				<button type="button" class="clear" onclick="clearInputs()">clear</button>
 			</div>
 		</form>
 	</body>
 </html>
 
 <script>
-	function dw() {
-		const button = document.querySelector('button');
-		button.classList.add('downloading');
-		
-		const form = document.getElementById('dwForm');
-		const formData = new FormData(form);
-		const urlParams = new URLSearchParams(formData);
+	function addInput() {
+		const container = document.getElementById('inputs-container');
+		const div = document.createElement('div');
+		div.className = 'input-group';
+		div.innerHTML = `
+			<input name="url" type="url" placeholder="Enter URL">
+			<button type="button" class="remove-btn" onclick="removeInput(this)">X</button>
+		`;
+		container.appendChild(div);
+		updateRemoveButtons();
+	}
 
-		fetch('/download', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded'
-			},
-			body: urlParams
-		})
-		.then(response => {
-			if (!response.ok) throw new Error('Network response was not ok');
+	function removeInput(btn) {
+		const container = document.getElementById('inputs-container');
+		if (container.children.length > 1) {
+			btn.parentElement.remove();
+			updateRemoveButtons();
+		}
+	}
 
-			const disposition = response.headers.get('Content-Disposition');
-			const fileNameMatch = disposition && disposition.match(/filename\*=UTF-8''(.+)/);
-			const fileName = fileNameMatch ? decodeURIComponent(fileNameMatch[1]) : 'audio.mp3';
-
-			return response.blob().then(blob => ({ blob, fileName }));
-		})
-		.then(({ blob, fileName }) => {
-			const url = window.URL.createObjectURL(blob);
-			const a = document.createElement('a');
-			a.href = url;
-			a.download = fileName;
-			document.body.appendChild(a);
-			a.click();
-			a.remove();
-			window.URL.revokeObjectURL(url);
-			button.classList.remove('downloading');
-		})
-		.catch(error => {
-			console.error('Error:', error);
-			alert('Download failed: ' + error.message);
-			button.classList.remove('downloading');
+	function updateRemoveButtons() {
+		const container = document.getElementById('inputs-container');
+		const buttons = container.querySelectorAll('.remove-btn');
+		const show = container.children.length > 1;
+		buttons.forEach((btn) => {
+			btn.style.display = show ? 'block' : 'none';
 		});
 	}
 
-	function clearInput() {
-		const input = document.querySelector('input[name="url"]');
-		input.value = '';
-		input.focus();
+	async function dw() {
+		const button = document.querySelector('button[onclick="dw()"]');
+		if (button.classList.contains('downloading')) return;
+
+		const inputs = document.querySelectorAll('input[name="url"]');
+		const urls = Array.from(inputs)
+			.map((i) => i.value)
+			.filter((v) => v.trim());
+
+		if (urls.length === 0) {
+			alert('Please enter at least one URL');
+			return;
+		}
+
+		button.classList.add('downloading');
+
+		let successCount = 0;
+		let failCount = 0;
+
+		for (const url of urls) {
+			try {
+				await downloadOne(url);
+				successCount++;
+			} catch (error) {
+				console.error('Error downloading ' + url, error);
+				failCount++;
+			}
+		}
+
+		button.classList.remove('downloading');
+
+		if (failCount > 0) {
+			alert(`Completed with ${failCount} errors. check console.`);
+		}
+	}
+
+	async function downloadOne(urlVal) {
+		const params = new URLSearchParams();
+		params.append('url', urlVal);
+
+		const response = await fetch('/download', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+			},
+			body: params,
+		});
+
+		if (!response.ok) throw new Error('Network response was not ok');
+
+		const disposition = response.headers.get('Content-Disposition');
+		const fileNameMatch = disposition && disposition.match(/filename\*=UTF-8''(.+)/);
+		const fileName = fileNameMatch ? decodeURIComponent(fileNameMatch[1]) : 'audio.mp3';
+
+		const blob = await response.blob();
+		const url = window.URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = fileName;
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+		window.URL.revokeObjectURL(url);
+	}
+
+	function clearInputs() {
+		const container = document.getElementById('inputs-container');
+		container.innerHTML = `
+			<div class="input-group">
+				<input name="url" type="url" placeholder="Enter URL">
+				<button type="button" class="remove-btn" onclick="removeInput(this)" style="display: none;">X</button>
+			</div>
+		`;
 	}
 </script>

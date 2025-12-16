@@ -1,8 +1,7 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import routers from "./routes";
-import path from "path";
+import cors from 'cors';
+import dotenv from 'dotenv';
+import express from 'express';
+import routers from './routes';
 
 dotenv.config();
 
@@ -19,9 +18,9 @@ app.use(express.urlencoded({ extended: true }));
 // app.set('view engine', 'ejs');
 
 /** routers */
-app.use("/", routers);
+app.use('/', routers);
 
 /** start server */
 app.listen(PORT, () => {
-  console.log(`✅ Server is running on http://localhost:${PORT}`);
+	console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
